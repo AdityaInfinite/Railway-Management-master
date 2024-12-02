@@ -9,6 +9,8 @@ import time
 from mysql.connector import DataError
 import random
 
+from tabulate import tabulate
+
 # Defining the per/km Charge of each Class
 sleeper_charge = int(1.5)
 third_ac_charge = int(2)
@@ -23,38 +25,17 @@ max_date = current_date + datetime.timedelta(days=120)
 
 
 # Functions
-
-
-def AvailableTrains():
-    """
-    AvailableTrains() -> Shows the List of Available Trains according to the User Requirement
-
-    Parameters -> None   
-    """
-
+def showinfo(cons):
+    data=[]
     mn = mysql.connector.connect(host="localhost", user="root",
                                  password="1234", database="railway")
     cur = mn.cursor()
-
-    print("Search by Entering the Station Codes!")
-    start_opt = input("From: ")
-    final_opt = input("To: ")
-    date = input("Date(YYYY-MM-DD): ")
-    date_user = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-    while date_user < current_date or date_user > max_date:
-        print("Please enter a Valid Date!")
-        date = input("Date(DD/MM/YYYY): ")
-        date_user = datetime.datetime.strptime(date, "%Y-%m-%d")
-        date_user = date_user.date()
-
-    cur.execute(
-        'SELECT Train_No, Source_Station_Name, Destination_Station_Name, Arrival_Time, Departure_Time from train_info where Source_Station_Code="{}" AND Destination_Station_Code="{}";'.format(
-            start_opt, final_opt))
+    cur.execute(cons)
     result = cur.fetchall()
     os.system("cls")
     time.sleep(1)
-    head = ["Train_No", "Source_Station_Name",
-            "Destination_Station_Name", "Arrival_Time", "Departure_Time"]
+    head = ["Train ID", "Departure Station",
+            "Destination Station"]
     if len(result) >= 10:
         try:
             print("Total of", len(result), "Records Found!")
@@ -62,71 +43,60 @@ def AvailableTrains():
         except ValueError:
             print("Please Enter a Valid Integer!")
         else:
-            print(head)
-            print(" ")
+            #print(head)
             for x in range(ask):
-                print(result[x], "\n")
+                data.append(result[x])
+            table = tabulate(data, headers=head, tablefmt="grid")
+            print(table,'\n')
+			
     elif len(result) == 0:
         print("No Trains Available!")
     else:
-        print(head)
-        print(" ")
         for x in result:
-            print(x, "\n")
+            data.append(x)
+        table = tabulate(data, headers=head, tablefmt="grid")
+        print(table,'\n')
 
     cur.close()
     mn.close()
 
+def AvailableTrains():
+    """
+    AvailableTrains() -> Shows the List of Available Trains according to the User Requirement
+
+    Parameters -> None   
+    
+    show all
+    filter by destination
+    filter by departure station
+    """
+    ch=int(input("AVAILABLE TRAIN MENU\n0: SHOW ALL\n1: FILTER BY DEPARTURE STATION\n2: FILTER BY DESTINATION\nenter your choice:"))
+    if ch==1:
+        dp=input("enter departure city (MUMBAI/PUNE/KOLKATA/BANGALORE/DELHI/CHENNAI)\ntype exactly:")
+        showinfo("select * from traininfo where DEPARTURE='%s'"%dp)
+        pass
+    elif ch==2:
+        ds=input("enter destination city (MUMBAI/PUNE/KOLKATA/BANGALORE/DELHI/CHENNAI)\ntype exactly:")
+        showinfo("select * from traininfo where DESTINATION='%s'"%ds)
+        pass
+    else:
+       showinfo("SELECT * FROM traininfo")
+       pass
 
 def CheckFare():
-    """
-    CheckFare() -> Calculates the Fare based on the Distance
-
-    Parameters -> None
-    """
-
-    mn = mysql.connector.connect(host="localhost", user="root",
-                                 password="1234", database="railway")
-    cur = mn.cursor()
-
-    print("Search by Entering the Station Code!")
-
-    header = [("Train_No", "Distance", "Sleeper",
-               "Third_AC", "Second_AC", "First_AC")]
-    start_opt = input("From: ")
-    final_opt = input("To: ")
-
-    cur.execute(
-        'SELECT Train_No, Distance from train_info where Source_Station_Code="{}" AND Destination_Station_Code="{}";'.format(
-            start_opt, final_opt))
-    result_fare = cur.fetchall()
-    time.sleep(1)
-    os.system("cls")
-    if len(result_fare) >= 10:
-        try:
-            print("Total of", len(result_fare), "Records Found!")
-            ask = int(input("Enter the Number of Records you want to See: "))
-        except ValueError:
-            print("Please Enter a Valid Integer!")
-        else:
-            print(header)
-            print(" ")
-            for x in range(ask):
-                y = result_fare[x]
-                print(result_fare[x], "Rs.", int(y[1]) * sleeper_charge, "Rs.", int(y[1]) * third_ac_charge, "Rs.",
-                      int(y[1]) * second_ac_charge, "Rs.", int(y[1]) * first_ac_charge, "\n")
-    elif len(result_fare) == 0:
-        print("No Available Trains!")
+    ss=input("Are you a senior citizen (Y/N):")
+    if ss in 'Yy':
+       Senior=1
+       print("You are a senior citizen confirmed")
     else:
-        print(header)
-        print(" ")
-        for x in result_fare:
-            print(x, "Rs.", int(x[1]) * sleeper_charge, "Rs.", int(x[1]) * third_ac_charge, "Rs.",
-                  int(x[1]) * second_ac_charge, "Rs.", int(x[1]) * first_ac_charge, "\n")
-
-    cur.close()
-    mn.close()
-
+        Senior=2
+        print("You are not a senior citizen confirmed")
+    c=int(input("which class are you travelling by:\n1 for first\n2 for second\n3 for general\nenter your choice:"))
+    if c not in (1,2,3):
+        print("enter class correctly (1/2/3)")
+        CheckFare()
+    else:
+        print("\nYour ticket is at a rate of "+str((1500/c)*Senior)+" per person\n")
 
 def ShowBookings():
     """
@@ -134,9 +104,8 @@ def ShowBookings():
 
     Parameters -> None
     """
-
-    mn = mysql.connector.connect(host="localhost", user="root",
-                                 password="1234", database="railway")
+    data=[]
+    mn = mysql.connector.connect(host="localhost", user='root',password='1234', database="railway")
     cur = mn.cursor()
 
     mobile_no = input("Please Enter your 10 Digit Mobile Number: ")
@@ -148,11 +117,13 @@ def ShowBookings():
         print("No Records Found!")
     else:
         booking_no = 1
-        print(["Train_No", "Passenger_Name", "Mobile_No",
-               "Passenger_Adhaar", "Time_Of_Booking", "Booking_ID", "Class"])
+        head=["Train_No", "Passenger_Name", "Mobile_No",
+               "Passenger_Adhaar", "Time_Of_Booking", "Booking_ID", "Class","departure date"]
         for x in result:
-            print("BOOKING NO", booking_no, ":", x, "\n")
+            data.append(x)
             booking_no += 1
+        table = tabulate(data, headers=head, tablefmt="grid")
+        print(table,'\n')
 
     cur.close()
     mn.close()
@@ -193,7 +164,7 @@ def BookTrain():
             print("Please Enter a Valid Mobile Number!")
             continue
         else:
-            if len(str(Mobile)) == 10 and Mobile != 0000000000:
+            if len(str(Mobile)) == 10:
                 break
             elif len(str(Mobile)) > 10 or len(str(Mobile)) < 10:
                 print("Please Enter a Valid 10 Digit Mobile Number!")
@@ -207,7 +178,7 @@ def BookTrain():
             print("Please Enter a Valid Adhaar Number!")
             continue
         else:
-            if len(str(adhaar)) == 12 and adhaar != 000000000000:
+            if len(str(adhaar)) == 12:
                 break
             elif len(str(adhaar)) > 12 or len(str(adhaar)) < 12:
                 print("Please Enter a Valid 12 Digit Adhaar Number!")
@@ -217,6 +188,44 @@ def BookTrain():
     Time_of_Booking = datetime.datetime.now()
     date = Time_of_Booking.date()
     date = date.strftime("%d-%m-%y")
+    #date of departure
+    while True:
+        print("Entering date of departure")
+        try:
+            year = int(input("Enter Year: "))
+        except ValueError:
+            print("Please Enter a Valid Year")
+            continue
+        else:
+            if len(str(year)) == 4: #REM add year
+                break
+            else:
+                print("Please Enter a Year")
+    while True:     
+        try:
+            month = int(input("Enter month number: "))
+        except ValueError:
+            print("Please Enter a Valid month number")
+            continue
+        else:
+            if month <= 12 and month >=1:
+                break
+            else:
+                print("Please Enter a valid month number")
+
+    while True:       
+        try:
+            mnum = int(input("Enter date of the month: "))
+        except ValueError:
+            print("Please Enter a date of the month")
+            continue
+        else:
+            if mnum in range(1,32):
+                break
+            else:
+                print("Please Enter a valid month number")
+                
+    depdate=(str(year)+'-'+str(month)+'-'+str(mnum))
 
     # Creating Unique ID for each Booking
     id = random.randint(1, 10000)
@@ -232,49 +241,53 @@ def BookTrain():
         else:
             break
 
-    print(["Sleeper", "AC-1", "AC-2", "AC-3"])
+
+    classes="1: First\n2: Second\n3: General\n"
+    print(classes)
     Class = None
     while True:
-        ask = input("Please Enter a Class from the one's given above: ")
-        if ask == "Sleeper":
-            Class = "Sleeper"
+        ask = int(input("Please Enter a Class from the one's given above: "))
+        if ask == 1:
+            Class = "First"
             break
-        elif ask == "AC-1":
-            Class = "AC-1"
+        elif ask == 2:
+            Class = "Second"
             break
-        elif ask == "AC-2":
-            Class = "AC-2"
-            break
-        elif ask == "AC-3":
-            Class = "AC-3"
+        elif ask == 3:
+            Class = "General"
             break
         else:
-            print(["Sleeper", "AC-1", "AC-2", "AC-3"])
+            print(classes)
             print("Please Choose an Option from Above!")
 
     while True:
+        q="select departure,destination from traininfo where tid="+str(train_no)
+        cur.execute(q)
+        res=cur.fetchall()
+        print("data entered:")
+        table = tabulate([[train_no, Name, Mobile, adhaar, date, Class,depdate,res[0][0],res[0][1]]], headers=['Train ID','Name','Mobile',"Aadhar",'booking date','class','departure date','departure from','destined to'], tablefmt="grid")
+        print(table)
+
         ask = input("Are you Sure you want to Book(Y/N): ")
         if ask in ["Y", "y"]:
             print("Booking...")
             try:
-                query = "INSERT INTO bookings values({}, '{}', '{}', '{}', '{}', {}, '{}')".format(
-                    train_no, Name, Mobile, adhaar, date, id, Class)
+                query = "INSERT INTO bookings values({}, '{}', '{}', '{}', '{}', {}, '{}','{}')".format(train_no, Name, Mobile, adhaar, date, id, Class,depdate)
                 cur.execute(query)
             except DataError:
                 print("Error in Booking!")
             else:
-                print("Successfully Booked!")
+                table2 = tabulate([[id,train_no, Name, Mobile, adhaar, date, Class,depdate,res[0][0],res[0][1]]], headers=['ticket ID','Train ID','Name','Mobile',"Aadhar",'booking date','class','departure date','departure from','destined to'], tablefmt="grid")
+                print(table2,"\nSuccessfully Booked!")
                 mn.commit()
                 cur.close()
                 mn.close()
                 break
-        elif ask in ["N", "n"]:
+        else:
             print("Stopping Booking...")
             time.sleep(0.5)
             os.system("cls")
             break
-        else:
-            print("Please Enter Y (Yes) or N (No)!")
 
 
 def CancelBooking():

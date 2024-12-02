@@ -14,7 +14,8 @@ connection_status = Check.CheckConnection()
 if connection_status is False:
     quit()
 else:
-    Check.CheckDatabase()  # Checking for the Requirements of the Project
+    pass
+    #REMCheck.CheckDatabase()  # Checking for the Requirements of the Project
 
 Other.ClearScreen()  # Clear the Terminal Window
 
@@ -37,7 +38,7 @@ while True:
         User.AvailableTrains()
     elif ans == "6":
         Other.ClearScreen()
-        Other.Menu()
+        #Other.Menu()
     elif ans == "7":
         #Other.Menu()
         continue
@@ -45,14 +46,8 @@ while True:
         Other.ClearScreen()
         Other.About()
         while True:
-            ask = input("Do you want to Display Menu(Y/N): ")
-            if ask in ["Y", "y"]:
-                Other.Menu()
-                break
-            elif ask in ["N", "n"]:
-                break
-            else:
-                print("Please Enter either Y (Yes) or N (No)!")
+            ask = input("enter anything to continue...")
+            break
     elif ans == "9":
         print("Closing all Connections..")
         sleep(0.5)
