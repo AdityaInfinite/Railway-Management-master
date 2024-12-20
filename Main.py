@@ -8,7 +8,7 @@ import core.Checks as Check
 from time import sleep
 
 # Initial Checks
-
+import core.vars as vars
 # Checking the Connection to the MySQL Server
 connection_status = Check.CheckConnection()
 if connection_status is False:
@@ -27,15 +27,15 @@ while True:
     Other.Menu()
     ans = input("Choose an Option Number: ")
     if ans == "1":
-        User.BookTrain()
-    elif ans == "2":
-        User.CancelBooking()
-    elif ans == "3":
-        User.CheckFare()
-    elif ans == "4":
-        User.ShowBookings()
-    elif ans == "5":
         User.AvailableTrains()
+    elif ans == "2":
+        User.BookTrain()
+    elif ans == "3":
+        User.ShowBookings()
+    elif ans == "4":
+        User.CancelBooking()
+    elif ans == "5":
+        User.CheckFare()
     elif ans == "6":
         Other.ClearScreen()
         #Other.Menu()

@@ -5,7 +5,6 @@
 import os
 import time
 
-
 # Functions
 
 def About():
@@ -15,7 +14,7 @@ def About():
     Parameters -> None
     """
     # Change the path given here to the absolute path of the README file
-    with open("C:\\Users\\dalvi_5aqptsx\\Desktop\\Railway-Management-master\\README.txt") as file:
+    with open("..\\..\\Railway-Management-master\\README.txt") as file:
         data = file.read()
         print(data)
 
@@ -41,11 +40,11 @@ def Menu(answer="Yes"):
 
     if answer in ["Yes", "Y"]:
         print("  WELCOME TO RAILWAY RESERVATION SYSTEM")
-        print("1. Book a Ticket")
-        print("2. Cancel a Booking")
-        print("3. Check Fares")
-        print("4. Show my Bookings")
-        print("5. Show Available Trains")
+        print("1. Show Available Trains")
+        print("2. Book a Ticket")
+        print("3. Show my Bookings")
+        print("4. Cancel a Booking")
+        print("5. Check Fares")
         print("6. Clear Screen")
         print("7. Menu")
         print("8. About")

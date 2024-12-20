@@ -7,6 +7,7 @@ from mysql.connector.errors import ProgrammingError, Error
 import core.InsertData as Insert
 
 # Functions
+import core.vars as vars
 
 
 def CheckDatabase():
@@ -18,8 +19,8 @@ def CheckDatabase():
 
     print("Checking Database Requirements..")
 
-    db = con.connect(host="localhost", user="root",
-                     database="", password="1234")
+    db = con.connect(host=vars.sqlhost, user=vars.sqluser,
+                     database="", password=vars.sqlpwd)
     cur = db.cursor()
     result = None
 
@@ -52,16 +53,16 @@ def CreateTables():
     Parameters -> None
     """
 
-    db = con.connect(host="localhost", user="root",
-                     database="railway", password="1234")
+    db = con.connect(host=vars.sqlhost, user=vars.sqluser,
+                     database=vars.sqldb, password=vars.sqlpwd)
     cur = db.cursor()
 
     cur.execute(
-        "create table train_info (Train_No varchar(10) NOT NULL, Station_Code varchar(20) NOT NULL, Station_Name varchar(30) NOT NULL, Arrival_Time varchar(20) NOT NULL, Departure_Time varchar(20) NOT NULL, Distance varchar(10) NOT NULL, Source_Station_Code varchar(20) NOT NULL, Source_Station_Name varchar(70) NOT NULL, Destination_Station_Code varchar(20) NOT NULL, Destination_Station_Name varchar(60) NOT NULL);")
+        "create table train_info (TID int NOT NULL, DEPARTURE varchar(30) NOT NULL, DESTINATION varchar(30));")
 
-    cur.execute("create table bookings (Train_No int NOT NULL, Passenger_Name varchar(30) NOT NULL, Mobile_No varchar(10) NOT NULL, Passenger_Adhaar varchar(12) NOT NULL, Date_Of_Booking varchar(20) NOT NULL, Booking_ID int NOT NULL, Class varchar(20) NOT NULL);")
+    cur.execute("create table bookings (Train_No int NOT NULL, Passenger_Name varchar(30) NOT NULL, Mobile_No varchar(10) NOT NULL, Passenger_Adhaar varchar(12) NOT NULL, Date_Of_Booking varchar(20) NOT NULL, Booking_ID int NOT NULL, Class varchar(20) NOT NULL, departuredate varchar(20));")
 
-    Insert.InsertDataTrain()
+    Insert.InsertTrainData()
 
     cur.close()
     db.close()
@@ -78,8 +79,8 @@ def CheckConnection():
         print("Checking the Connection to the MySQL Server..")
         connection = con.connect(host='localhost',
                                  database='',
-                                 user="root",
-                                 password="1234")
+                                 user=vars.sqluser,
+                                 password=vars.sqlpwd)
         if connection.is_connected():
             db_Info = connection.get_server_info()
             print("Connected to MySQL Server Version", db_Info)

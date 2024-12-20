@@ -11,6 +11,8 @@ import random
 
 from tabulate import tabulate
 
+import core.vars as vars
+
 # Defining the per/km Charge of each Class
 sleeper_charge = int(1.5)
 third_ac_charge = int(2)
@@ -27,8 +29,8 @@ max_date = current_date + datetime.timedelta(days=120)
 # Functions
 def showinfo(cons):
     data=[]
-    mn = mysql.connector.connect(host="localhost", user="root",
-                                 password="1234", database="railway")
+    mn = mysql.connector.connect(host=vars.sqlhost, user=vars.sqluser,
+                                 password=vars.sqlpwd, database=vars.sqldb)
     cur = mn.cursor()
     cur.execute(cons)
     result = cur.fetchall()
@@ -105,7 +107,7 @@ def ShowBookings():
     Parameters -> None
     """
     data=[]
-    mn = mysql.connector.connect(host="localhost", user='root',password='1234', database="railway")
+    mn = mysql.connector.connect(host=vars.sqlhost, user='root',password='1234', database=vars.sqldb)
     cur = mn.cursor()
 
     mobile_no = input("Please Enter your 10 Digit Mobile Number: ")
@@ -136,8 +138,8 @@ def BookTrain():
     Parameters -> None
     """
 
-    mn = mysql.connector.connect(host="localhost", user="root",
-                                 password="1234", database="railway")
+    mn = mysql.connector.connect(host=vars.sqlhost, user=vars.sqluser,
+                                 password=vars.sqlpwd, database=vars.sqldb)
     cur = mn.cursor()
     while True:
         try:
@@ -197,7 +199,7 @@ def BookTrain():
             print("Please Enter a Valid Year")
             continue
         else:
-            if len(str(year)) == 4: #REM add year
+            if len(str(year)) == 4:
                 break
             else:
                 print("Please Enter a Year")
@@ -297,8 +299,8 @@ def CancelBooking():
     Parameters -> None
     """
 
-    mn = mysql.connector.connect(host="localhost", user="root",
-                                 password="1234", database="railway")
+    mn = mysql.connector.connect(host=vars.sqlhost, user=vars.sqluser,
+                                 password=vars.sqlpwd, database=vars.sqldb)
     cur = mn.cursor()
 
     print("Please use the Show my Bookings Option\n to get the Unique ID of the Booking you want to Cancel!")
