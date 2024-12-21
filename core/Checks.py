@@ -58,7 +58,7 @@ def CreateTables():
     cur = db.cursor()
 
     cur.execute(
-        "create table train_info (TID int NOT NULL, DEPARTURE varchar(30) NOT NULL, DESTINATION varchar(30));")
+        "create table traininfo (TID int NOT NULL, DEPARTURE varchar(30) NOT NULL, DESTINATION varchar(30));")
 
     cur.execute("create table bookings (Train_No int NOT NULL, Passenger_Name varchar(30) NOT NULL, Mobile_No varchar(10) NOT NULL, Passenger_Adhaar varchar(12) NOT NULL, Date_Of_Booking varchar(20) NOT NULL, Booking_ID int NOT NULL, Class varchar(20) NOT NULL, departuredate varchar(20));")
 
